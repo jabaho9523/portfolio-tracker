@@ -14,7 +14,7 @@
   --color-primary:#01696f;--color-success:#34c759;--color-error:#ff3b30;
   --color-warning:#ff9500;--color-badge-hold-bg:#e5e5ea;--color-badge-hold-text:#1d1d1f;
   --shadow-card:0 2px 12px rgba(0,0,0,0.07);
-  --font-body:'Inter',system-ui,sans-serif;
+  --font-body:"Inter",system-ui,sans-serif;
   --radius-md:0.5rem;--radius-lg:0.75rem;--radius-full:9999px;
   --transition:180ms cubic-bezier(0.16,1,0.3,1);
 }
@@ -28,32 +28,27 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
 body{font-family:var(--font-body);font-size:14px;background:var(--color-bg);color:var(--color-text);min-height:100dvh;padding:0}
-a{color:var(--color-primary);text-decoration:none}
 button{cursor:pointer;font:inherit;color:inherit;border:none;background:none}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:100;gap:12px}
 .topbar-left{display:flex;align-items:center;gap:12px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:-0.02em}
+.logo{font-weight:600;font-size:15px;letter-spacing:-0.02em}
 .topbar-actions{display:flex;align-items:center;gap:8px}
 .main{max-width:960px;margin:0 auto;padding:24px 16px 48px}
 .rules-banner{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .rule-pill{font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius-full);background:var(--color-surface-2);color:var(--color-text-muted);border:1px solid var(--color-border)}
 .rules-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted)}
 .section{margin-bottom:32px}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
-.section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted)}
+.section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);margin-bottom:12px}
 .add-row{display:flex;gap:8px;margin-bottom:12px}
 .add-input{flex:1;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:8px 12px;font-size:13px;color:var(--color-text);outline:none;transition:border-color var(--transition)}
 .add-input:focus{border-color:var(--color-primary)}
 .add-input::placeholder{color:var(--color-text-muted)}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-md);font-size:13px;font-weight:500;transition:background var(--transition),color var(--transition),box-shadow var(--transition)}
-.btn-ghost{background:var(--color-surface-2);color:var(--color-text);border:1px solid var(--color-border)}
+.btn-ghost{display:inline-flex;align-items:center;padding:5px 10px;border-radius:var(--radius-md);font-size:12px;font-weight:500;background:var(--color-surface-2);color:var(--color-text);border:1px solid var(--color-border);transition:background var(--transition)}
 .btn-ghost:hover{background:var(--color-border)}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-run{padding:9px 20px;font-size:14px;font-weight:600;background:var(--color-primary);color:#fff;border-radius:var(--radius-md)}
+.btn-run{padding:9px 20px;font-size:14px;font-weight:600;background:var(--color-primary);color:#fff;border-radius:var(--radius-md);transition:filter var(--transition)}
 .btn-run:hover{filter:brightness(1.12)}
 .btn-run:disabled{opacity:0.5;cursor:not-allowed;filter:none}
-.theme-toggle{width:34px;height:34px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);background:var(--color-surface-2);border:1px solid var(--color-border);flex-shrink:0}
-.theme-toggle:hover{color:var(--color-text);background:var(--color-border)}
+.theme-toggle{width:34px;height:34px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);background:var(--color-surface-2);border:1px solid var(--color-border)}
 .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card)}
 table{width:100%;border-collapse:collapse}
 thead th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--color-border);background:var(--color-surface-2)}
@@ -61,23 +56,25 @@ tbody tr{border-bottom:1px solid var(--color-border);transition:background var(-
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--color-surface-2)}
 td{padding:11px 14px;font-size:13px;vertical-align:middle}
-.ticker-cell{font-weight:600;letter-spacing:0.02em;font-size:14px}
+.ticker-cell{font-weight:600;font-size:14px}
 .price-cell{font-variant-numeric:tabular-nums;font-weight:500}
 .pass{color:var(--color-success);font-weight:500}
 .fail{color:var(--color-error);font-weight:500}
 .neutral{color:var(--color-text-muted)}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:600;letter-spacing:0.02em}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:600}
 .badge-buy{background:rgba(48,209,88,0.15);color:var(--color-success)}
 .badge-warn{background:rgba(255,69,58,0.15);color:var(--color-error)}
 .badge-hold{background:var(--color-badge-hold-bg);color:var(--color-badge-hold-text)}
 .badge-wait{background:rgba(255,214,10,0.15);color:var(--color-warning)}
-.remove-btn{width:24px;height:24px;border-radius:var(--radius-md);display:inline-flex;align-items:center;justify-content:center;color:var(--color-text-muted);font-size:16px;background:none;transition:color var(--transition),background var(--transition)}
+.remove-btn{width:24px;height:24px;border-radius:var(--radius-md);display:inline-flex;align-items:center;justify-content:center;color:var(--color-text-muted);font-size:16px;transition:color var(--transition),background var(--transition)}
 .remove-btn:hover{color:var(--color-error);background:rgba(255,69,58,0.1)}
+.retry-btn{font-size:11px;color:var(--color-primary);background:none;border:none;cursor:pointer;padding:2px 6px}
 .status-bar{text-align:center;padding:10px;font-size:12px;color:var(--color-text-muted);min-height:34px}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:32px 16px;color:var(--color-text-muted);font-size:13px}
 .updated-tag{font-size:11px;color:var(--color-text-muted)}
+.reset-btn{font-size:11px;color:var(--color-text-muted);padding:5px 10px;border-radius:var(--radius-md);background:var(--color-surface-2);border:1px solid var(--color-border)}
 @media(max-width:600px){
   .topbar{padding:12px 14px}
   .main{padding:16px 12px 48px}
@@ -87,7 +84,6 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 </style>
 </head>
 <body>
-
 <header class="topbar">
   <div class="topbar-left">
     <svg aria-label="Technical Tracker" width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -99,8 +95,8 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
   </div>
   <div class="topbar-actions">
     <span id="last-updated" class="updated-tag"></span>
-    <button class="btn btn-ghost btn-sm" onclick="resetAll()" style="font-size:11px;color:var(--color-text-muted)">Reset</button>
-    <button class="btn btn-run" id="run-btn" onclick="runAnalysis()">▶ Run Analysis</button>
+    <button class="reset-btn" onclick="resetAll()">Reset</button>
+    <button class="btn-run" id="run-btn" onclick="runAnalysis()">&#9654; Run Analysis</button>
     <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -110,17 +106,17 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 <main class="main">
   <div class="rules-banner">
     <span class="rules-label">Buy Rules</span>
-    <span class="rule-pill">① Price &gt; 200-day SMA</span>
-    <span class="rule-pill">② RSI (14) &lt; 30</span>
-    <span class="rule-pill">③ MACD Bullish Crossover</span>
+    <span class="rule-pill">&#9312; Price &gt; 200-day SMA</span>
+    <span class="rule-pill">&#9313; RSI (14) &lt; 30</span>
+    <span class="rule-pill">&#9314; MACD Bullish Crossover</span>
     <span class="rule-pill" style="margin-left:auto;background:rgba(48,209,88,0.1);color:var(--color-success);border-color:transparent">All 3 = BUY SIGNAL</span>
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="section-title">Portfolio</span></div>
+    <div class="section-title">Portfolio</div>
     <div class="add-row">
       <input class="add-input" id="portfolio-input" placeholder="Add ticker (e.g. IREN, TSM)" onkeydown="if(event.key==='Enter')addTicker('portfolio')">
-      <button class="btn btn-ghost btn-sm" onclick="addTicker('portfolio')">+ Add</button>
+      <button class="btn-ghost" onclick="addTicker('portfolio')">+ Add</button>
     </div>
     <div class="card">
       <table>
@@ -131,10 +127,10 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="section-title">Watchlist</span></div>
+    <div class="section-title">Watchlist</div>
     <div class="add-row">
       <input class="add-input" id="wishlist-input" placeholder="Add ticker (e.g. NVDA, CRSP)" onkeydown="if(event.key==='Enter')addTicker('wishlist')">
-      <button class="btn btn-ghost btn-sm" onclick="addTicker('wishlist')">+ Add</button>
+      <button class="btn-ghost" onclick="addTicker('wishlist')">+ Add</button>
     </div>
     <div class="card">
       <table>
@@ -148,179 +144,196 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 </main>
 
 <script>
-const STORAGE_KEY='technical-tracker-v1';
+const STORAGE_KEY = 'tt-v2';
 
 function saveState(){
-  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify({portfolio:state.portfolio,wishlist:state.wishlist})); }
-  catch(e){}
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({portfolio:state.portfolio,wishlist:state.wishlist})); } catch(e){}
 }
-
 function loadState(){
   try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const s=JSON.parse(raw);
-      return{portfolio:Array.isArray(s.portfolio)?s.portfolio:['TSM','IREN','ERJ','COIN','TSLA'],wishlist:Array.isArray(s.wishlist)?s.wishlist:['NVDA','CRSP','PLTR'],results:{}};
-    }
-  }catch(e){}
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const s=JSON.parse(raw); return {portfolio:Array.isArray(s.portfolio)?s.portfolio:['TSM','IREN','COIN'],wishlist:Array.isArray(s.wishlist)?s.wishlist:['NVDA','PLTR'],results:{}}; }
+  } catch(e){}
   return null;
 }
 
-const _saved=loadState();
-let state=_saved||{portfolio:['TSM','IREN','ERJ','COIN','TSLA'],wishlist:['NVDA','CRSP','PLTR'],results:{}};
+const _saved = loadState();
+let state = _saved || {portfolio:['TSM','IREN','COIN'],wishlist:['NVDA','PLTR'],results:{}};
 
 (function(){
-  const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
+  const t=document.querySelector('[data-theme-toggle]'), h=document.documentElement;
   let d=h.getAttribute('data-theme')||'dark';
-  h.setAttribute('data-theme',d);
-  t&&t.addEventListener('click',()=>{
-    d=d==='dark'?'light':'dark';
-    h.setAttribute('data-theme',d);
-    t.innerHTML=d==='dark'
-      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  });
+  function setIcon(d){ t.innerHTML = d==='dark' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'; }
+  h.setAttribute('data-theme', d); setIcon(d);
+  t && t.addEventListener('click', ()=>{ d=d==='dark'?'light':'dark'; h.setAttribute('data-theme',d); setIcon(d); });
 })();
 
-function renderTables(){
-  renderSection('portfolio',state.portfolio);
-  renderSection('wishlist',state.wishlist);
-}
+function renderTables(){ renderSection('portfolio',state.portfolio); renderSection('wishlist',state.wishlist); }
 
-function renderSection(section,tickers){
-  const tbody=document.getElementById(section+'-tbody');
-  tbody.innerHTML='';
-  if(!tickers.length){
-    tbody.innerHTML='<tr><td colspan="7" class="empty-state">No tickers yet — add one above</td></tr>';
-    return;
-  }
-  tickers.forEach(tk=>{
-    const r=state.results[tk];
-    const tr=document.createElement('tr');
-    if(r&&!r.loading&&!r.error){
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td class="price-cell">$${r.price}</td><td class="${r.trend?'pass':'fail'}">${r.trend?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">SMA $${r.sma200}</span></td><td class="${r.rsiPass?'pass':'fail'}">${r.rsiPass?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">RSI ${r.rsi}</span></td><td class="${r.macd?'pass':'fail'}">${r.macd?'✓ Bullish':'✗ Bearish'}</td><td>${getStatusBadge(r)}</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
-    }else if(r&&r.loading){
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral"><span class="spinner"></span>Fetching…</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
-    }else if(r&&r.error){
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="4" style="color:var(--color-error);font-size:12px">⚠ ${r.error}</td><td><button onclick="retrySingle('${tk}')" style="font-size:11px;color:var(--color-primary);background:none;border:none;cursor:pointer;padding:2px 6px">↺ Retry</button></td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
-    }else{
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral">Not yet analysed — click Run Analysis</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
+function renderSection(section, tickers){
+  const tbody = document.getElementById(section+'-tbody');
+  tbody.innerHTML = '';
+  if(!tickers.length){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">No tickers yet — add one above</td></tr>'; return; }
+  tickers.forEach(tk => {
+    const r = state.results[tk];
+    const tr = document.createElement('tr');
+    if(r && !r.loading && !r.error){
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td class="price-cell">$${r.price}</td>
+        <td class="${r.trend?'pass':'fail'}">${r.trend?'&#10003; Pass':'&#10007; Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">SMA $${r.sma200}</span></td>
+        <td class="${r.rsiPass?'pass':'fail'}">${r.rsiPass?'&#10003; Pass':'&#10007; Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">RSI ${r.rsi}</span></td>
+        <td class="${r.macd?'pass':'fail'}">${r.macd?'&#10003; Bullish':'&#10007; Bearish'}</td>
+        <td>${getStatusBadge(r)}</td>
+        <td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
+    } else if(r && r.loading){
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral"><span class="spinner"></span>Fetching&hellip;</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
+    } else if(r && r.error){
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="4" style="color:var(--color-error);font-size:12px">&#9888; ${r.error}</td>
+        <td><button class="retry-btn" onclick="retrySingle('${tk}')">&#8635; Retry</button></td>
+        <td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
+    } else {
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral">Not analysed yet &mdash; tap Run Analysis</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
     }
     tbody.appendChild(tr);
   });
 }
 
 function getStatusBadge(r){
-  if(r.trend&&r.rsiPass&&r.macd) return '<span class="badge badge-buy">🟢 BUY SIGNAL</span>';
-  if(!r.trend) return '<span class="badge badge-warn">⚠ Downtrend</span>';
-  if(r.trend&&!r.rsiPass&&r.macd) return '<span class="badge badge-wait">⏳ Wait for Dip</span>';
-  return '<span class="badge badge-hold">— Hold</span>';
+  if(r.trend && r.rsiPass && r.macd) return '<span class="badge badge-buy">&#128994; BUY SIGNAL</span>';
+  if(!r.trend) return '<span class="badge badge-warn">&#9888; Downtrend</span>';
+  if(r.trend && r.macd && !r.rsiPass) return '<span class="badge badge-wait">&#8987; Wait for Dip</span>';
+  return '<span class="badge badge-hold">&mdash; Hold</span>';
 }
 
 function addTicker(section){
-  const input=document.getElementById(section+'-input');
-  const val=input.value.trim().toUpperCase();
-  if(!val||state[section].includes(val)){input.value='';return;}
+  const input = document.getElementById(section+'-input');
+  const val = input.value.trim().toUpperCase();
+  if(!val || state[section].includes(val)){ input.value=''; return; }
   state[section].push(val);
-  input.value='';
+  input.value = '';
   saveState();
   renderTables();
 }
 
-function removeTicker(section,tk){
-  state[section]=state[section].filter(t=>t!==tk);
+function removeTicker(section, tk){
+  state[section] = state[section].filter(t=>t!==tk);
   saveState();
   renderTables();
 }
 
 function resetAll(){
   if(!confirm('Clear all tickers and reset to defaults?')) return;
-  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
-  state={portfolio:['TSM','IREN','ERJ','COIN','TSLA'],wishlist:['NVDA','CRSP','PLTR'],results:{}};
+  try{ localStorage.removeItem(STORAGE_KEY); } catch(e){}
+  state = {portfolio:['TSM','IREN','COIN'],wishlist:['NVDA','PLTR'],results:{}};
   saveState();
   renderTables();
 }
 
-function setStatus(msg,spinner=false){
-  document.getElementById('status-bar').innerHTML=spinner?`<span class="spinner"></span>${msg}`:msg;
+function setStatus(msg, spinner=false){
+  document.getElementById('status-bar').innerHTML = spinner ? `<span class="spinner"></span>${msg}` : msg;
+}
+
+async function fetchWithTimeout(url, ms=9000){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), ms);
+  try{
+    const res = await fetch(url, {signal:ctrl.signal});
+    clearTimeout(timer);
+    return res;
+  } catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('Timeout');
+    throw e;
+  }
 }
 
 async function fetchStockData(ticker){
-  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`;
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),8000);
-  let res;
-  try{
-    res=await fetch(url,{signal:controller.signal});
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError') throw new Error('Timeout — tap ↺ Retry');
-    throw e;
+  const target = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`;
+
+  const proxies = [
+    () => `https://corsproxy.io/?url=${encodeURIComponent(target)}`,
+    () => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+    () => `https://cors-anywhere.com/${target}`,
+  ];
+
+  let lastErr = 'All proxies failed';
+  for(const makeUrl of proxies){
+    try{
+      const res = await fetchWithTimeout(makeUrl(), 9000);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const result = json?.chart?.result?.[0];
+      if(!result) throw new Error('No data returned');
+      const closes = result.indicators.quote[0].close.filter(v=>v!=null);
+      if(closes.length < 50) throw new Error('Insufficient history');
+      const price  = +closes[closes.length-1].toFixed(2);
+      const slice  = closes.slice(-200);
+      const sma200 = +(slice.reduce((a,b)=>a+b,0)/slice.length).toFixed(2);
+      const rsi    = calcRSI(closes, 14);
+      const [macdLine, sigLine] = calcMACD(closes);
+      return {price, sma200, trend:price>sma200, rsi:+rsi.toFixed(1), rsiPass:rsi<30, macd:macdLine>sigLine};
+    } catch(e){
+      lastErr = e.message || 'Failed';
+    }
   }
-  clearTimeout(timer);
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json=await res.json();
-  const result=json.chart.result[0];
-  const closes=result.indicators.quote[0].close.filter(v=>v!==null);
-  if(closes.length<50) throw new Error('Insufficient data');
-  const price=+closes[closes.length-1].toFixed(2);
-  const smaSlice=closes.slice(-200);
-  const sma200=+(smaSlice.reduce((a,b)=>a+b,0)/smaSlice.length).toFixed(2);
-  const rsi=calcRSI(closes,14);
-  const[macdLine,signalLine]=calcMACD(closes);
-  return{price,sma200,trend:price>sma200,rsi:+rsi.toFixed(1),rsiPass:rsi<30,macd:macdLine>signalLine};
+  throw new Error(lastErr);
 }
 
-function ema(arr,period){
-  const k=2/(period+1);
-  let prev=arr.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  const out=[prev];
-  for(let i=period;i<arr.length;i++){prev=arr[i]*k+prev*(1-k);out.push(prev);}
+function ema(arr, period){
+  const k = 2/(period+1);
+  let prev = arr.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  const out = [prev];
+  for(let i=period; i<arr.length; i++){ prev = arr[i]*k + prev*(1-k); out.push(prev); }
   return out;
 }
 
-function calcRSI(closes,period){
-  let gains=[],losses=[];
-  for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}
-  let ag=gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  let al=losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  for(let i=period;i<gains.length;i++){ag=(ag*(period-1)+gains[i])/period;al=(al*(period-1)+losses[i])/period;}
+function calcRSI(closes, period){
+  let gains=[], losses=[];
+  for(let i=1; i<closes.length; i++){
+    const d = closes[i]-closes[i-1];
+    gains.push(d>0?d:0); losses.push(d<0?-d:0);
+  }
+  let ag = gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  let al = losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period; i<gains.length; i++){
+    ag = (ag*(period-1)+gains[i])/period;
+    al = (al*(period-1)+losses[i])/period;
+  }
   return 100-(100/(1+(ag/(al||0.0001))));
 }
 
 function calcMACD(closes){
-  const fast=ema(closes,12),slow=ema(closes,26);
-  const offset=closes.length-slow.length;
-  const macdArr=slow.map((_,i)=>fast[i+offset]-slow[i]);
-  const sig=ema(macdArr,9);
-  return[macdArr[macdArr.length-1],sig[sig.length-1]];
+  const fast = ema(closes, 12), slow = ema(closes, 26);
+  const offset = closes.length - slow.length;
+  const macdArr = slow.map((_,i) => fast[i+offset] - slow[i]);
+  const sig = ema(macdArr, 9);
+  return [macdArr[macdArr.length-1], sig[sig.length-1]];
 }
 
 async function retrySingle(tk){
-  state.results[tk]={loading:true};
+  state.results[tk] = {loading:true};
   renderTables();
-  try{state.results[tk]=await fetchStockData(tk);}
-  catch(e){state.results[tk]={error:e.message||'Failed'};}
+  try{ state.results[tk] = await fetchStockData(tk); }
+  catch(e){ state.results[tk] = {error: e.message||'Failed'}; }
   renderTables();
 }
 
 async function runAnalysis(){
-  const btn=document.getElementById('run-btn');
-  btn.disabled=true;
-  const allTickers=[...new Set([...state.portfolio,...state.wishlist])];
-  let done=0;
-  for(const tk of allTickers){state.results[tk]={loading:true};renderTables();}
-  for(const tk of allTickers){
-    try{state.results[tk]=await fetchStockData(tk);}
-    catch(e){state.results[tk]={error:e.message||'Failed to fetch'};}
-    done++;
-    setStatus(`Analysing… ${done}/${allTickers.length}`,true);
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  const all = [...new Set([...state.portfolio,...state.wishlist])];
+  for(const tk of all){ state.results[tk]={loading:true}; }
+  renderTables();
+  let done = 0;
+  for(const tk of all){
+    setStatus(`Analysing… ${++done}/${all.length}`, true);
+    try{ state.results[tk] = await fetchStockData(tk); }
+    catch(e){ state.results[tk] = {error: e.message||'Failed'}; }
     renderTables();
   }
-  const now=new Date().toLocaleString('da-DK',{timeZone:'Europe/Copenhagen',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
-  document.getElementById('last-updated').textContent=`Updated ${now}`;
+  const now = new Date().toLocaleString('da-DK',{timeZone:'Europe/Copenhagen',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+  document.getElementById('last-updated').textContent = `Updated ${now}`;
   setStatus('');
-  btn.disabled=false;
+  btn.disabled = false;
 }
 
 renderTables();
