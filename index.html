@@ -98,6 +98,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
   </div>
   <div class="topbar-actions">
     <span id="last-updated" class="updated-tag"></span>
+    <button class="reset-btn" id="key-btn" onclick="setFinnhubKey()" title="Finnhub API key for analyst ratings">🔑 Set API key</button>
     <button class="reset-btn" onclick="resetAll()">Reset</button>
     <button class="btn-run" id="run-btn" onclick="runAnalysis()">&#9654; Run Analysis</button>
     <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
@@ -368,25 +369,53 @@ async function fetchStockData(ticker){
   throw new Error(lastErr);
 }
 
-// Best-effort analyst consensus from Yahoo. This endpoint is sometimes
-// auth-gated, so failures are swallowed and the column just shows "—".
+// Analyst consensus from Finnhub (https://finnhub.io). Finnhub serves CORS
+// headers, so no proxy is needed. A free API key is stored per-browser in
+// localStorage (never committed). Returns null if no key or no coverage.
+const FINNHUB_KEY = 'tt-finnhub-key';
+
+function getFinnhubKey(){
+  try{ return localStorage.getItem(FINNHUB_KEY) || ''; }catch(e){ return ''; }
+}
+function setFinnhubKey(){
+  const cur = getFinnhubKey();
+  const k = prompt('Finnhub API key (free at finnhub.io/register).\nStored only in this browser.', cur);
+  if(k===null) return;
+  try{ localStorage.setItem(FINNHUB_KEY, k.trim()); }catch(e){}
+  updateKeyBtn();
+}
+function updateKeyBtn(){
+  const btn = document.getElementById('key-btn');
+  if(btn) btn.textContent = getFinnhubKey() ? '🔑 Key set' : '🔑 Set API key';
+}
+
+// Map a Finnhub recommendation row to {key, mean, n} where mean is a
+// Yahoo-style 1..5 score (1=Strong Buy, 5=Strong Sell) for a familiar feel.
+function summariseRec(t){
+  const sb=t.strongBuy||0, b=t.buy||0, h=t.hold||0, s=t.sell||0, ss=t.strongSell||0;
+  const n = sb+b+h+s+ss;
+  if(!n) return null;
+  const mean = (sb*1 + b*2 + h*3 + s*4 + ss*5) / n;
+  let key;
+  if(mean<1.5) key='strong_buy';
+  else if(mean<2.5) key='buy';
+  else if(mean<3.5) key='hold';
+  else if(mean<4.5) key='underperform';
+  else key='sell';
+  return {key, mean, n};
+}
+
 async function fetchAnalyst(ticker){
-  const tk = encodeURIComponent(ticker);
-  for(const host of ['query1','query2']){
-    try{
-      const json = await fetchJSON(`https://${host}.finance.yahoo.com/v10/finance/quoteSummary/${tk}?modules=financialData,recommendationTrend`);
-      const res = json?.quoteSummary?.result?.[0];
-      if(!res) continue;
-      const fd = res.financialData || {};
-      const key = (fd.recommendationKey && fd.recommendationKey !== 'none') ? fd.recommendationKey : null;
-      const mean = fd.recommendationMean && fd.recommendationMean.raw!=null ? fd.recommendationMean.raw : null;
-      const t = res.recommendationTrend && res.recommendationTrend.trend && res.recommendationTrend.trend[0];
-      const n = t ? (t.strongBuy+t.buy+t.hold+t.sell+t.strongSell) : null;
-      if(!key && mean==null) continue;
-      return {key, mean, n};
-    } catch(e){ /* ignore — best effort */ }
-  }
-  return null;
+  const apikey = getFinnhubKey();
+  if(!apikey) return null; // no key configured — column stays "—"
+  try{
+    const url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(ticker)}&token=${encodeURIComponent(apikey)}`;
+    const res = await fetchWithTimeout(url, 12000);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const arr = await res.json();
+    if(!Array.isArray(arr) || !arr.length) return null;
+    return summariseRec(arr[0]); // newest period first
+  }catch(e){ return null; }
 }
 
 function ema(arr, period){
@@ -472,6 +501,7 @@ async function runAnalysis(){
   btn.disabled = false;
 }
 
+updateKeyBtn();
 renderTables();
 </script>
 </body>
