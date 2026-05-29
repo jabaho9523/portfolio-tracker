@@ -246,33 +246,51 @@ async function fetchWithTimeout(url, ms=9000){
   }
 }
 
-async function fetchStockData(ticker){
-  const target = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`;
+function parseChart(json){
+  const result = json?.chart?.result?.[0];
+  if(!result) throw new Error('No data returned');
+  const closes = result.indicators.quote[0].close.filter(v=>v!=null);
+  if(closes.length < 50) throw new Error('Insufficient history');
+  const price  = +closes[closes.length-1].toFixed(2);
+  const slice  = closes.slice(-200);
+  const sma200 = +(slice.reduce((a,b)=>a+b,0)/slice.length).toFixed(2);
+  const rsi    = calcRSI(closes, 14);
+  const [macdLine, sigLine] = calcMACD(closes);
+  return {price, sma200, trend:price>sma200, rsi:+rsi.toFixed(1), rsiPass:rsi<30, macd:macdLine>sigLine};
+}
 
-  const proxies = [
-    () => `https://corsproxy.io/?url=${encodeURIComponent(target)}`,
-    () => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
-    () => `https://cors-anywhere.com/${target}`,
+async function fetchStockData(ticker){
+  const tk = encodeURIComponent(ticker);
+  // Yahoo's chart endpoint has no CORS headers, so we route through public CORS
+  // proxies. Try both Yahoo hosts across several proxies for resilience.
+  const targets = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${tk}?interval=1d&range=1y`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${tk}?interval=1d&range=1y`,
   ];
 
-  let lastErr = 'All proxies failed';
-  for(const makeUrl of proxies){
-    try{
-      const res = await fetchWithTimeout(makeUrl(), 9000);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const result = json?.chart?.result?.[0];
-      if(!result) throw new Error('No data returned');
-      const closes = result.indicators.quote[0].close.filter(v=>v!=null);
-      if(closes.length < 50) throw new Error('Insufficient history');
-      const price  = +closes[closes.length-1].toFixed(2);
-      const slice  = closes.slice(-200);
-      const sma200 = +(slice.reduce((a,b)=>a+b,0)/slice.length).toFixed(2);
-      const rsi    = calcRSI(closes, 14);
-      const [macdLine, sigLine] = calcMACD(closes);
-      return {price, sma200, trend:price>sma200, rsi:+rsi.toFixed(1), rsiPass:rsi<30, macd:macdLine>sigLine};
-    } catch(e){
-      lastErr = e.message || 'Failed';
+  // wrap:true means the proxy returns {contents:"<raw body>"} (AllOrigins /get).
+  const proxies = [
+    { make: t => `https://api.allorigins.win/raw?url=${encodeURIComponent(t)}`, wrap:false },
+    { make: t => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(t)}`, wrap:false },
+    { make: t => `https://corsproxy.io/?url=${encodeURIComponent(t)}`, wrap:false },
+    { make: t => `https://api.allorigins.win/get?url=${encodeURIComponent(t)}`, wrap:true },
+  ];
+
+  let lastErr = 'All data sources failed';
+  for(const target of targets){
+    for(const p of proxies){
+      try{
+        const res = await fetchWithTimeout(p.make(target), 12000);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        let json = await res.json();
+        if(p.wrap){
+          if(!json || typeof json.contents !== 'string') throw new Error('Empty proxy response');
+          json = JSON.parse(json.contents);
+        }
+        return parseChart(json);
+      } catch(e){
+        lastErr = e.message || 'Failed';
+      }
     }
   }
   throw new Error(lastErr);
