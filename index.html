@@ -46,8 +46,6 @@ button{cursor:pointer;font:inherit;color:inherit;border:none;background:none}
 .add-input:focus{border-color:var(--color-primary)}
 .add-input::placeholder{color:var(--color-text-muted)}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-md);font-size:13px;font-weight:500;transition:background var(--transition),color var(--transition),box-shadow var(--transition)}
-.btn-primary{background:var(--color-primary);color:#fff}
-.btn-primary:hover{filter:brightness(1.12)}
 .btn-ghost{background:var(--color-surface-2);color:var(--color-text);border:1px solid var(--color-border)}
 .btn-ghost:hover{background:var(--color-border)}
 .btn-sm{padding:5px 10px;font-size:12px}
@@ -200,12 +198,11 @@ function renderSection(section,tickers){
     const r=state.results[tk];
     const tr=document.createElement('tr');
     if(r&&!r.loading&&!r.error){
-      const statusBadge=getStatusBadge(r);
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td class="price-cell">$${r.price}</td><td class="${r.trend?'pass':'fail'}">${r.trend?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">SMA $${r.sma200}</span></td><td class="${r.rsiPass?'pass':'fail'}">${r.rsiPass?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">RSI ${r.rsi}</span></td><td class="${r.macd?'pass':'fail'}">${r.macd?'✓ Bullish':'✗ Bearish'}</td><td>${statusBadge}</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
+      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td class="price-cell">$${r.price}</td><td class="${r.trend?'pass':'fail'}">${r.trend?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">SMA $${r.sma200}</span></td><td class="${r.rsiPass?'pass':'fail'}">${r.rsiPass?'✓ Pass':'✗ Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">RSI ${r.rsi}</span></td><td class="${r.macd?'pass':'fail'}">${r.macd?'✓ Bullish':'✗ Bearish'}</td><td>${getStatusBadge(r)}</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
     }else if(r&&r.loading){
       tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral"><span class="spinner"></span>Fetching…</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
     }else if(r&&r.error){
-      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="5" style="color:var(--color-error);font-size:12px">⚠ ${r.error}</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
+      tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="4" style="color:var(--color-error);font-size:12px">⚠ ${r.error}</td><td><button onclick="retrySingle('${tk}')" style="font-size:11px;color:var(--color-primary);background:none;border:none;cursor:pointer;padding:2px 6px">↺ Retry</button></td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
     }else{
       tr.innerHTML=`<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral">Not yet analysed — click Run Analysis</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">×</button></td>`;
     }
@@ -250,7 +247,17 @@ function setStatus(msg,spinner=false){
 
 async function fetchStockData(ticker){
   const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`;
-  const res=await fetch(url);
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8000);
+  let res;
+  try{
+    res=await fetch(url,{signal:controller.signal});
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('Timeout — tap ↺ Retry');
+    throw e;
+  }
+  clearTimeout(timer);
   if(!res.ok) throw new Error(`HTTP ${res.status}`);
   const json=await res.json();
   const result=json.chart.result[0];
@@ -287,6 +294,14 @@ function calcMACD(closes){
   const macdArr=slow.map((_,i)=>fast[i+offset]-slow[i]);
   const sig=ema(macdArr,9);
   return[macdArr[macdArr.length-1],sig[sig.length-1]];
+}
+
+async function retrySingle(tk){
+  state.results[tk]={loading:true};
+  renderTables();
+  try{state.results[tk]=await fetchStockData(tk);}
+  catch(e){state.results[tk]={error:e.message||'Failed'};}
+  renderTables();
 }
 
 async function runAnalysis(){
