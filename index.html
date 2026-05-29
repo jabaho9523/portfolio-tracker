@@ -37,6 +37,8 @@ button{cursor:pointer;font:inherit;color:inherit;border:none;background:none}
 .rules-banner{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .rule-pill{font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius-full);background:var(--color-surface-2);color:var(--color-text-muted);border:1px solid var(--color-border)}
 .rules-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted)}
+.precheck-banner{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.check-pill{font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius-full);background:var(--color-surface-2);color:var(--color-text);border:1px solid var(--color-border)}
 .section{margin-bottom:32px}
 .section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);margin-bottom:12px}
 .add-row{display:flex;gap:8px;margin-bottom:12px}
@@ -61,6 +63,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 .pass{color:var(--color-success);font-weight:500}
 .fail{color:var(--color-error);font-weight:500}
 .neutral{color:var(--color-text-muted)}
+.sub{font-size:11px;color:var(--color-text-muted);display:block;font-weight:400}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:600}
 .badge-buy{background:rgba(48,209,88,0.15);color:var(--color-success)}
 .badge-warn{background:rgba(255,69,58,0.15);color:var(--color-error)}
@@ -78,7 +81,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 @media(max-width:600px){
   .topbar{padding:12px 14px}
   .main{padding:16px 12px 48px}
-  thead th:nth-child(2),td:nth-child(2){display:none}
+  thead th:nth-child(2),td:nth-child(2),thead th:nth-child(6),td:nth-child(6){display:none}
   .rules-banner{display:none}
 }
 </style>
@@ -95,6 +98,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
   </div>
   <div class="topbar-actions">
     <span id="last-updated" class="updated-tag"></span>
+    <button class="reset-btn" id="key-btn" onclick="setFinnhubKey()" title="Finnhub API key for analyst ratings">🔑 Set API key</button>
     <button class="reset-btn" onclick="resetAll()">Reset</button>
     <button class="btn-run" id="run-btn" onclick="runAnalysis()">&#9654; Run Analysis</button>
     <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
@@ -104,12 +108,20 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
 </header>
 
 <main class="main">
+  <div class="precheck-banner">
+    <span class="rules-label">Before buying</span>
+    <span class="check-pill">&#9744; Not overloaded in this sector</span>
+    <span class="check-pill">&#9744; No earnings within ~7 days</span>
+  </div>
   <div class="rules-banner">
-    <span class="rules-label">Buy Rules</span>
+    <span class="rules-label">Buy</span>
     <span class="rule-pill">&#9312; Price &gt; 200-day SMA</span>
-    <span class="rule-pill">&#9313; RSI (14) &lt; 30</span>
-    <span class="rule-pill">&#9314; MACD Bullish Crossover</span>
-    <span class="rule-pill" style="margin-left:auto;background:rgba(48,209,88,0.1);color:var(--color-success);border-color:transparent">All 3 = BUY SIGNAL</span>
+    <span class="rule-pill">&#9313; RSI dipped ~30, turning up</span>
+    <span class="rule-pill">&#9314; MACD &uarr; cross + rising volume</span>
+    <span class="rule-pill" style="background:rgba(48,209,88,0.1);color:var(--color-success);border-color:transparent">All 3 = BUY</span>
+    <span class="rules-label" style="margin-left:auto">Exit</span>
+    <span class="rule-pill">RSI &gt; 70 + MACD &darr; cross = take profit</span>
+    <span class="rule-pill">Below 200-SMA, or &minus;15% stop (set in Nordnet)</span>
   </div>
 
   <div class="section">
@@ -120,7 +132,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
     </div>
     <div class="card">
       <table>
-        <thead><tr><th>Ticker</th><th>Price</th><th>Trend (SMA)</th><th>Value (RSI)</th><th>MACD</th><th>Action</th><th></th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Price</th><th>Trend (SMA)</th><th>Value (RSI)</th><th>MACD / Vol</th><th>Analyst</th><th>Action</th><th></th></tr></thead>
         <tbody id="portfolio-tbody"></tbody>
       </table>
     </div>
@@ -134,7 +146,7 @@ td{padding:11px 14px;font-size:13px;vertical-align:middle}
     </div>
     <div class="card">
       <table>
-        <thead><tr><th>Ticker</th><th>Price</th><th>Trend (SMA)</th><th>Value (RSI)</th><th>MACD</th><th>Action</th><th></th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Price</th><th>Trend (SMA)</th><th>Value (RSI)</th><th>MACD / Vol</th><th>Analyst</th><th>Action</th><th></th></tr></thead>
         <tbody id="wishlist-tbody"></tbody>
       </table>
     </div>
@@ -173,34 +185,66 @@ function renderTables(){ renderSection('portfolio',state.portfolio); renderSecti
 function renderSection(section, tickers){
   const tbody = document.getElementById(section+'-tbody');
   tbody.innerHTML = '';
-  if(!tickers.length){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">No tickers yet — add one above</td></tr>'; return; }
+  if(!tickers.length){ tbody.innerHTML='<tr><td colspan="8" class="empty-state">No tickers yet — add one above</td></tr>'; return; }
   tickers.forEach(tk => {
     const r = state.results[tk];
     const tr = document.createElement('tr');
     if(r && !r.loading && !r.error){
       tr.innerHTML = `<td class="ticker-cell">${tk}</td><td class="price-cell">$${r.price}</td>
-        <td class="${r.trend?'pass':'fail'}">${r.trend?'&#10003; Pass':'&#10007; Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">SMA $${r.sma200}</span></td>
-        <td class="${r.rsiPass?'pass':'fail'}">${r.rsiPass?'&#10003; Pass':'&#10007; Fail'}<span style="font-size:11px;color:var(--color-text-muted);display:block">RSI ${r.rsi}</span></td>
-        <td class="${r.macd?'pass':'fail'}">${r.macd?'&#10003; Bullish':'&#10007; Bearish'}</td>
+        ${trendCell(r)}${valueCell(r)}${macdCell(r)}
+        <td>${analystCell(r.analyst)}</td>
         <td>${getStatusBadge(r)}</td>
         <td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
     } else if(r && r.loading){
-      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral"><span class="spinner"></span>Fetching&hellip;</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="6" class="neutral"><span class="spinner"></span>Fetching&hellip;</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
     } else if(r && r.error){
-      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="4" style="color:var(--color-error);font-size:12px">&#9888; ${r.error}</td>
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="5" style="color:var(--color-error);font-size:12px">&#9888; ${r.error}</td>
         <td><button class="retry-btn" onclick="retrySingle('${tk}')">&#8635; Retry</button></td>
         <td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
     } else {
-      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="5" class="neutral">Not analysed yet &mdash; tap Run Analysis</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
+      tr.innerHTML = `<td class="ticker-cell">${tk}</td><td colspan="6" class="neutral">Not analysed yet &mdash; tap Run Analysis</td><td><button class="remove-btn" onclick="removeTicker('${section}','${tk}')">&#215;</button></td>`;
     }
     tbody.appendChild(tr);
   });
 }
 
+function trendCell(r){
+  return `<td class="${r.trend?'pass':'fail'}">${r.trend?'&#10003; Pass':'&#10007; Fail'}<span class="sub">SMA $${r.sma200}</span></td>`;
+}
+function valueCell(r){
+  let lbl, cls;
+  if(r.valueSignal){ lbl='&#10003; Dip &uarr;'; cls='pass'; }
+  else if(r.recentDip && !r.turningUp){ lbl='Dipping'; cls='neutral'; }
+  else if(r.overbought){ lbl='Overbought'; cls='fail'; }
+  else { lbl='&mdash;'; cls='neutral'; }
+  return `<td class="${cls}">${lbl}<span class="sub">RSI ${r.rsi}</span></td>`;
+}
+function macdCell(r){
+  let lbl, cls;
+  if(r.crossUp){ lbl='&#10003; Cross &uarr;'; cls='pass'; }
+  else if(r.macd){ lbl='Bullish'; cls='pass'; }
+  else if(r.crossDown){ lbl='&#10007; Cross &darr;'; cls='fail'; }
+  else { lbl='Bearish'; cls='fail'; }
+  const vol = r.volumeRising ? '<span class="sub" style="color:var(--color-success)">Vol &uarr;</span>' : '<span class="sub">Vol &rarr;</span>';
+  return `<td class="${cls}">${lbl}${vol}</td>`;
+}
+function analystCell(a){
+  if(!a || (!a.key && a.mean==null)) return '<span class="neutral">&mdash;</span>';
+  const map={strong_buy:['Strong Buy','pass'],buy:['Buy','pass'],hold:['Hold','neutral'],underperform:['Underperform','fail'],sell:['Sell','fail'],strong_sell:['Strong Sell','fail']};
+  const m=map[a.key]||[(a.key||'&mdash;'),'neutral'];
+  const mean=a.mean!=null?`<span class="sub">${a.mean.toFixed(2)}${a.n?` &middot; ${a.n} an.`:''}</span>`:'';
+  return `<span class="${m[1]}">${m[0]}</span>${mean}`;
+}
+
+// Buy: trend + RSI dip turning up + MACD up-cross on rising volume.
+// Exit: below 200-SMA. Take profit: RSI>70 + MACD down-cross.
 function getStatusBadge(r){
-  if(r.trend && r.rsiPass && r.macd) return '<span class="badge badge-buy">&#128994; BUY SIGNAL</span>';
-  if(!r.trend) return '<span class="badge badge-warn">&#9888; Downtrend</span>';
-  if(r.trend && r.macd && !r.rsiPass) return '<span class="badge badge-wait">&#8987; Wait for Dip</span>';
+  if(!r.trend) return '<span class="badge badge-warn">&#9888; Below 200 &mdash; Exit</span>';
+  if(r.overbought && r.crossDown) return '<span class="badge badge-wait">&#9211; Take Profit</span>';
+  if(r.valueSignal && r.triggerSignal) return '<span class="badge badge-buy">&#128994; BUY SIGNAL</span>';
+  if(r.valueSignal && !r.triggerSignal) return '<span class="badge badge-wait">&#8987; Wait: Trigger</span>';
+  if(r.recentDip && !r.turningUp) return '<span class="badge badge-wait">&#8987; Wait: Dip</span>';
+  if(r.overbought) return '<span class="badge badge-wait">&#128293; Overbought</span>';
   return '<span class="badge badge-hold">&mdash; Hold</span>';
 }
 
@@ -249,51 +293,129 @@ async function fetchWithTimeout(url, ms=9000){
 function parseChart(json){
   const result = json?.chart?.result?.[0];
   if(!result) throw new Error('No data returned');
-  const closes = result.indicators.quote[0].close.filter(v=>v!=null);
+  const q = result.indicators.quote[0];
+  // Keep closes and volumes aligned by dropping bars with a null close.
+  const closes = [], vols = [];
+  for(let i=0; i<q.close.length; i++){
+    if(q.close[i]!=null){ closes.push(q.close[i]); vols.push(q.volume && q.volume[i]!=null ? q.volume[i] : 0); }
+  }
   if(closes.length < 50) throw new Error('Insufficient history');
+
   const price  = +closes[closes.length-1].toFixed(2);
   const slice  = closes.slice(-200);
   const sma200 = +(slice.reduce((a,b)=>a+b,0)/slice.length).toFixed(2);
-  const rsi    = calcRSI(closes, 14);
-  const [macdLine, sigLine] = calcMACD(closes);
-  return {price, sma200, trend:price>sma200, rsi:+rsi.toFixed(1), rsiPass:rsi<30, macd:macdLine>sigLine};
+  const trend  = price > sma200;
+
+  // --- Value (RSI): dipped to ~30 recently and now turning up ---
+  const rsiSeries = calcRSISeries(closes, 14);
+  const rsi     = rsiSeries[rsiSeries.length-1];
+  const rsiPrev = rsiSeries[rsiSeries.length-2];
+  const recentDip = rsiSeries.slice(-10).some(v => v<=32);
+  const turningUp = rsi > rsiPrev;
+  const overbought = rsi > 70;
+  const valueSignal = recentDip && turningUp && rsi < 50;
+
+  // --- Trigger (MACD): bullish cross within last ~5 days, on rising volume ---
+  const {macd:macdArr, signal:sigArr} = calcMACDSeries(closes);
+  const lastM = macdArr[macdArr.length-1], lastS = sigArr[sigArr.length-1];
+  const crossUp   = crossedRecently(macdArr, sigArr, 5, 'up');
+  const crossDown = crossedRecently(macdArr, sigArr, 5, 'down');
+  const avg = (a) => a.reduce((x,y)=>x+y,0)/a.length;
+  const volumeRising = vols.length>=20 && avg(vols.slice(-5)) > avg(vols.slice(-20));
+  const triggerSignal = crossUp && volumeRising;
+
+  return {
+    price, sma200, trend,
+    rsi:+rsi.toFixed(2), recentDip, turningUp, overbought, valueSignal,
+    macd: lastM>lastS, crossUp, crossDown, volumeRising, triggerSignal,
+  };
+}
+
+// Yahoo's endpoints have no CORS headers, so route through public CORS proxies.
+// wrap:true means the proxy returns {contents:"<raw body>"} (AllOrigins /get).
+const PROXIES = [
+  { make: t => `https://api.allorigins.win/raw?url=${encodeURIComponent(t)}`, wrap:false },
+  { make: t => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(t)}`, wrap:false },
+  { make: t => `https://corsproxy.io/?url=${encodeURIComponent(t)}`, wrap:false },
+  { make: t => `https://api.allorigins.win/get?url=${encodeURIComponent(t)}`, wrap:true },
+];
+
+async function fetchJSON(target){
+  let lastErr = 'All data sources failed';
+  for(const p of PROXIES){
+    try{
+      const res = await fetchWithTimeout(p.make(target), 12000);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      let json = await res.json();
+      if(p.wrap){
+        if(!json || typeof json.contents !== 'string') throw new Error('Empty proxy response');
+        json = JSON.parse(json.contents);
+      }
+      return json;
+    } catch(e){ lastErr = e.message || 'Failed'; }
+  }
+  throw new Error(lastErr);
 }
 
 async function fetchStockData(ticker){
   const tk = encodeURIComponent(ticker);
-  // Yahoo's chart endpoint has no CORS headers, so we route through public CORS
-  // proxies. Try both Yahoo hosts across several proxies for resilience.
-  const targets = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${tk}?interval=1d&range=1y`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${tk}?interval=1d&range=1y`,
-  ];
-
-  // wrap:true means the proxy returns {contents:"<raw body>"} (AllOrigins /get).
-  const proxies = [
-    { make: t => `https://api.allorigins.win/raw?url=${encodeURIComponent(t)}`, wrap:false },
-    { make: t => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(t)}`, wrap:false },
-    { make: t => `https://corsproxy.io/?url=${encodeURIComponent(t)}`, wrap:false },
-    { make: t => `https://api.allorigins.win/get?url=${encodeURIComponent(t)}`, wrap:true },
-  ];
-
   let lastErr = 'All data sources failed';
-  for(const target of targets){
-    for(const p of proxies){
-      try{
-        const res = await fetchWithTimeout(p.make(target), 12000);
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        let json = await res.json();
-        if(p.wrap){
-          if(!json || typeof json.contents !== 'string') throw new Error('Empty proxy response');
-          json = JSON.parse(json.contents);
-        }
-        return parseChart(json);
-      } catch(e){
-        lastErr = e.message || 'Failed';
-      }
-    }
+  for(const host of ['query1','query2']){
+    try{
+      const json = await fetchJSON(`https://${host}.finance.yahoo.com/v8/finance/chart/${tk}?interval=1d&range=2y`);
+      return parseChart(json);
+    } catch(e){ lastErr = e.message || 'Failed'; }
   }
   throw new Error(lastErr);
+}
+
+// Analyst consensus from Finnhub (https://finnhub.io). Finnhub serves CORS
+// headers, so no proxy is needed. A free API key is stored per-browser in
+// localStorage (never committed). Returns null if no key or no coverage.
+const FINNHUB_KEY = 'tt-finnhub-key';
+
+function getFinnhubKey(){
+  try{ return localStorage.getItem(FINNHUB_KEY) || ''; }catch(e){ return ''; }
+}
+function setFinnhubKey(){
+  const cur = getFinnhubKey();
+  const k = prompt('Finnhub API key (free at finnhub.io/register).\nStored only in this browser.', cur);
+  if(k===null) return;
+  try{ localStorage.setItem(FINNHUB_KEY, k.trim()); }catch(e){}
+  updateKeyBtn();
+}
+function updateKeyBtn(){
+  const btn = document.getElementById('key-btn');
+  if(btn) btn.textContent = getFinnhubKey() ? '🔑 Key set' : '🔑 Set API key';
+}
+
+// Map a Finnhub recommendation row to {key, mean, n} where mean is a
+// Yahoo-style 1..5 score (1=Strong Buy, 5=Strong Sell) for a familiar feel.
+function summariseRec(t){
+  const sb=t.strongBuy||0, b=t.buy||0, h=t.hold||0, s=t.sell||0, ss=t.strongSell||0;
+  const n = sb+b+h+s+ss;
+  if(!n) return null;
+  const mean = (sb*1 + b*2 + h*3 + s*4 + ss*5) / n;
+  let key;
+  if(mean<1.5) key='strong_buy';
+  else if(mean<2.5) key='buy';
+  else if(mean<3.5) key='hold';
+  else if(mean<4.5) key='underperform';
+  else key='sell';
+  return {key, mean, n};
+}
+
+async function fetchAnalyst(ticker){
+  const apikey = getFinnhubKey();
+  if(!apikey) return null; // no key configured — column stays "—"
+  try{
+    const url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(ticker)}&token=${encodeURIComponent(apikey)}`;
+    const res = await fetchWithTimeout(url, 12000);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const arr = await res.json();
+    if(!Array.isArray(arr) || !arr.length) return null;
+    return summariseRec(arr[0]); // newest period first
+  }catch(e){ return null; }
 }
 
 function ema(arr, period){
@@ -304,33 +426,58 @@ function ema(arr, period){
   return out;
 }
 
-function calcRSI(closes, period){
-  let gains=[], losses=[];
-  for(let i=1; i<closes.length; i++){
+// Wilder's RSI, returned as a series aligned to closes[period..end].
+function calcRSISeries(closes, period){
+  const out = [];
+  let ag=0, al=0;
+  for(let i=1; i<=period; i++){
     const d = closes[i]-closes[i-1];
-    gains.push(d>0?d:0); losses.push(d<0?-d:0);
+    ag += d>0?d:0; al += d<0?-d:0;
   }
-  let ag = gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  let al = losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  for(let i=period; i<gains.length; i++){
-    ag = (ag*(period-1)+gains[i])/period;
-    al = (al*(period-1)+losses[i])/period;
+  ag/=period; al/=period;
+  out.push(100-(100/(1+(ag/(al||1e-9)))));
+  for(let i=period+1; i<closes.length; i++){
+    const d = closes[i]-closes[i-1];
+    ag = (ag*(period-1)+(d>0?d:0))/period;
+    al = (al*(period-1)+(d<0?-d:0))/period;
+    out.push(100-(100/(1+(ag/(al||1e-9)))));
   }
-  return 100-(100/(1+(ag/(al||0.0001))));
+  return out;
 }
 
-function calcMACD(closes){
+// MACD(12,26,9). Returns macd & signal arrays aligned to the same dates.
+function calcMACDSeries(closes){
   const fast = ema(closes, 12), slow = ema(closes, 26);
-  const offset = closes.length - slow.length;
-  const macdArr = slow.map((_,i) => fast[i+offset] - slow[i]);
-  const sig = ema(macdArr, 9);
-  return [macdArr[macdArr.length-1], sig[sig.length-1]];
+  const diff = fast.length - slow.length;
+  const macd = slow.map((s,i) => fast[i+diff] - s);
+  const signal = ema(macd, 9);
+  return { macd: macd.slice(macd.length - signal.length), signal };
+}
+
+// Did macd cross signal within the last `lookback` bars, in `dir` direction?
+function crossedRecently(macd, signal, lookback, dir){
+  const start = Math.max(1, macd.length - lookback);
+  for(let i=start; i<macd.length; i++){
+    const prev = macd[i-1] - signal[i-1], cur = macd[i] - signal[i];
+    if(dir==='up'   && prev<=0 && cur>0) return true;
+    if(dir==='down' && prev>=0 && cur<0) return true;
+  }
+  return false;
+}
+
+// Fill in the analyst column without blocking the main signal. Failures are
+// silent — the column just stays "—".
+function loadAnalyst(tk){
+  fetchAnalyst(tk).then(a => {
+    const r = state.results[tk];
+    if(r && !r.error && !r.loading){ r.analyst = a; renderTables(); }
+  }).catch(()=>{});
 }
 
 async function retrySingle(tk){
   state.results[tk] = {loading:true};
   renderTables();
-  try{ state.results[tk] = await fetchStockData(tk); }
+  try{ state.results[tk] = await fetchStockData(tk); loadAnalyst(tk); }
   catch(e){ state.results[tk] = {error: e.message||'Failed'}; }
   renderTables();
 }
@@ -344,7 +491,7 @@ async function runAnalysis(){
   let done = 0;
   for(const tk of all){
     setStatus(`Analysing… ${++done}/${all.length}`, true);
-    try{ state.results[tk] = await fetchStockData(tk); }
+    try{ state.results[tk] = await fetchStockData(tk); loadAnalyst(tk); }
     catch(e){ state.results[tk] = {error: e.message||'Failed'}; }
     renderTables();
   }
@@ -354,6 +501,7 @@ async function runAnalysis(){
   btn.disabled = false;
 }
 
+updateKeyBtn();
 renderTables();
 </script>
 </body>
