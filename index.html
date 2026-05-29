@@ -216,7 +216,8 @@ function valueCell(r){
   if(r.valueSignal){ lbl='&#10003; Dip &uarr;'; cls='pass'; }
   else if(r.recentDip && !r.turningUp){ lbl='Dipping'; cls='neutral'; }
   else if(r.overbought){ lbl='Overbought'; cls='fail'; }
-  else { lbl='&mdash;'; cls='neutral'; }
+  else if(r.rsi >= 60){ lbl='Elevated'; cls='neutral'; }
+  else { lbl='Neutral'; cls='neutral'; }
   return `<td class="${cls}">${lbl}<span class="sub">RSI ${r.rsi}</span></td>`;
 }
 function macdCell(r){
